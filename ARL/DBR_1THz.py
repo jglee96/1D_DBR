@@ -3,28 +3,28 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import pixelDBR
 
-N_pixel = 100
+N_pixel = 80
 dx = 5
-nh = 2.6811  # TiO2 at 400 nm (Siefke)
-nl = 1.4701  # SiO2 at 400 nm (Malitson)
+nh = 2.092  # SiO2 at 1 THz
+nl = 1  # AIr
+c = 299792458 * (10**6)
 
-minwave = 200
-maxwave = 800
+tarwave = 300
+minwave = 150
+maxwave = 3000
 wavestep = 5
 wavelength = np.array([np.arange(minwave, maxwave, wavestep)])
-tarwave = 400
 bandwidth = 50
 
 # Base data
-th =tarwave/(4*nh)
+th = tarwave/(4*nh)
 tl = tarwave/(4*nl)
 print("======== Design Information ========")
 print('tarwave: {}, nh: {:.3f}, nl: {:.3f}'.format(tarwave, nh, nl))
 print('Th: {}, Tl: {}'.format(th, tl))
 
-Nfile = 10
-Nsample = 10000
-TRAIN_PATH = 'D:/1D_DBR/trainset'
+Nfile = 20
+TRAIN_PATH = 'D:/1D_DBR/trainset/02'
 
 def getData():
     # Load Training Data
@@ -46,6 +46,7 @@ def getData():
     sY = np.concatenate(Yarray)
 
     return sX, sY
+
 
 def getThickness(s, dx, N_pixel):
     thickness = []
@@ -80,17 +81,18 @@ def main():
 
     x = np.reshape(wavelength, wavelength.shape[1])
     result_R = np.reshape(result_R, wavelength.shape[1])
-    plt.figure(2)
+    plt.figure(1)
     plt.subplot(2, 1, 1)
     plt.plot(x, result_R)
 
-    lx = np.arange(N_pixel)
     plt.subplot(2, 1, 2)
-    plt.bar(lx, result_state, width=1, color='blue')
-    # plt.show()
+    x = (c * (1. / wavelength))
+    x = np.reshape(x*(10**-12), wavelength.shape[1])
+    plt.plot(x, result_R)
 
-    plt.figure(1)
-    plt.bar(lx, rX, width=1, color='blue')
+    plt.figure(2)
+    lx = np.arange(N_pixel)
+    plt.bar(lx, result_state, width=1, color='blue')
     plt.show()
 
     thickness = getThickness(result_state, dx, N_pixel)
