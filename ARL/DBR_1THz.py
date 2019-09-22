@@ -23,8 +23,8 @@ print("======== Design Information ========")
 print('tarwave: {}, nh: {:.3f}, nl: {:.3f}'.format(tarwave, nh, nl))
 print('Th: {}, Tl: {}'.format(th, tl))
 
-Nfile = 20
-TRAIN_PATH = 'D:/1D_DBR/trainset/02'
+Nfile = 1
+TRAIN_PATH = 'D:/1D_DBR/trainset/04'
 
 def getData():
     # Load Training Data
@@ -57,7 +57,7 @@ def getThickness(s, dx, N_pixel):
         else:
             thickness.append(t * dx)
             t = 1
-    
+
     return thickness
 
 
@@ -76,8 +76,19 @@ def main():
     result_R = np.reshape(result_R, newshape=(1, wavelength.shape[1]))
     result_reward = pixelDBR.reward(result_R, tarwave, wavelength, bandwidth)
     result_fwhm = pixelDBR.calFWHM(result_R, wavelength, tarwave)
+    print("========        Result      ========")
     print('result reward: ', result_reward)
     print('resulr fwhm: ', result_fwhm)
+    thickness = getThickness(result_state, dx, N_pixel)
+    print(thickness)
+
+    for idx, x in enumerate(result_state):
+        if idx == 0:
+            print("[{}, ".format(x), end='')
+        elif idx == N_pixel-1:
+            print("{}]".format(x), end='')
+        else:
+            print("{}, ".format(x), end='')
 
     x = np.reshape(wavelength, wavelength.shape[1])
     result_R = np.reshape(result_R, wavelength.shape[1])
@@ -94,9 +105,6 @@ def main():
     lx = np.arange(N_pixel)
     plt.bar(lx, result_state, width=1, color='blue')
     plt.show()
-
-    thickness = getThickness(result_state, dx, N_pixel)
-    print(thickness)
 
 if __name__ == "__main__":
     main()

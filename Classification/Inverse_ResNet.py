@@ -6,7 +6,9 @@ import argparse
 from datetime import datetime
 
 PATH = 'D:/1D_DBR/Classification'
-TRAIN_PATH = 'D:/1D_DBR/trainset/02'
+TRAIN_PATH = 'D:/1D_DBR/trainset/04'
+Nfile = 1
+
 
 def getData():
     # Load Training Data
@@ -60,7 +62,7 @@ def main(n_batch, lr_rate, beta1, beta2, n_hidden):
     trainY = sY[0:Nlearning, :]
     trainX_total = trainX
     trainY_total = trainY
-    n_copy = 20
+    n_copy = 30
     for i in range(n_copy):
         trainX, trainY = shuffle_data(trainX, trainY)
         trainX_total = np.concatenate((trainX_total, trainX), axis=0)
@@ -71,18 +73,19 @@ def main(n_batch, lr_rate, beta1, beta2, n_hidden):
         X = tf.placeholder(tf.float32, [None, INPUT_SIZE])
         Y = tf.placeholder(tf.float32, [None, OUTPUT_SIZE])
 
-        net = tf.layers.dense(Y, n_hidden[0], activation=tf.nn.sigmoid, kernel_initializer=tf.contrib.layers.xavier_initializer(), name="transe")
+        net = tf.layers.dense(Y, n_hidden[0], activation=tf.nn.relu, kernel_initializer=tf.contrib.layers.xavier_initializer(), name="transe")
         for i, n in enumerate(n_hidden):
             shortcut = net
-            net = tf.layers.dense(net, n, activation=tf.nn.sigmoid, kernel_initializer=tf.contrib.layers.xavier_initializer(), name="dense"+str(i)+"_1")
+            net = tf.layers.dense(net, n, activation=tf.nn.relu, kernel_initializer=tf.contrib.layers.xavier_initializer(), name="dense"+str(i)+"_1")
             net = tf.layers.dense(net, n, activation=None, kernel_initializer=tf.contrib.layers.xavier_initializer(), name="dense"+str(i)+"_2")
-            net = tf.nn.sigmoid(tf.add(net, shortcut))
+            net = tf.nn.relu(tf.add(net, shortcut))
 
         with tf.name_scope('Xhat'):
             net = tf.layers.dense(net, INPUT_SIZE, activation=tf.nn.sigmoid, name="Xhat")
         Xhat = net
 
-        loss = -tf.reduce_mean(X * tf.log(Xhat) + (1 - X) * tf.log(1 - Xhat))
+        # loss = -tf.reduce_mean(X * tf.log(Xhat) + (1 - X) * tf.log(1 - Xhat))
+        loss = tf.losses.log_loss(labels=X, predictions=Xhat)
         train = tf.train.AdamOptimizer(learning_rate=lr_rate).minimize(loss)
     loss_hist = tf.summary.scalar('loss', loss)
 
@@ -116,13 +119,13 @@ def main(n_batch, lr_rate, beta1, beta2, n_hidden):
                 testY[n*n_batch:(n+1)*n_batch, :], [n_batch, OUTPUT_SIZE])
             feed_test = {X: feed_testX, Y: feed_testY}
             test_loss.append(sess.run(loss, feed_dict=feed_test))
-        Xtest = np.reshape(sess.run(Xhat, feed_dict={Y: np.reshape(testY[99, :], [1, OUTPUT_SIZE])}), newshape=(N_pixel, int(N_pixel/2)))
+        Xtest = np.reshape(sess.run(Xhat, feed_dict={Y: np.reshape(testY[99, :], [1, OUTPUT_SIZE])}), newshape=(1,INPUT_SIZE))
         plt.figure(1)
-        plt.subplot(2, 1, 1)
-        plt.imshow(Xtest, cmap='gray')
+        plt.subplot(1, 2, 1)
+        plt.imshow(Xtest, cmap='gray', aspect='auto')
         plt.colorbar()
-        plt.subplot(2, 1, 2)
-        plt.imshow(np.reshape(testX[99, :], newshape=(N_pixel, int(N_pixel/2))), cmap='gray')
+        plt.subplot(1, 2, 2)
+        plt.imshow(np.reshape(testX[99, :], newshape=(1, INPUT_SIZE)), cmap='gray', aspect='auto')
         plt.colorbar()
         print(np.mean(test_loss))
         plt.show()
@@ -134,7 +137,7 @@ if __name__ == "__main__":
     parser.add_argument("--lr_rate", type=float, default=1E-3)
     parser.add_argument("--beta1", type=float, default=0.9)
     parser.add_argument("--beta2", type=float, default=0.999)
-    parser.add_argument("--n_hidden", default=[100, 100, 100, 100])
+    parser.add_argument("--n_hidden", default=[600, 600, 600, 600])
     args = parser.parse_args()
     dict = vars(args)
 

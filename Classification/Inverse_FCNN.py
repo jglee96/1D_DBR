@@ -6,7 +6,9 @@ import argparse
 from datetime import datetime
 
 PATH = 'D:/1D_DBR/Classification'
-TRAIN_PATH = 'D:/1D_DBR/trainset/02'
+TRAIN_PATH = 'D:/1D_DBR/trainset/04'
+Nfile = 1
+
 
 def getData():
     # Load Training Data
@@ -60,7 +62,7 @@ def main(n_batch, lr_rate, beta1, beta2, n_hidden):
     trainY = sY[0:Nlearning, :]
     trainX_total = trainX
     trainY_total = trainY
-    n_copy = 20
+    n_copy = 30
     for i in range(n_copy):
         trainX, trainY = shuffle_data(trainX, trainY)
         trainX_total = np.concatenate((trainX_total, trainX), axis=0)
@@ -114,13 +116,13 @@ def main(n_batch, lr_rate, beta1, beta2, n_hidden):
                 testY[n*n_batch:(n+1)*n_batch, :], [n_batch, OUTPUT_SIZE])
             feed_test = {X: feed_testX, Y: feed_testY}
             test_loss.append(sess.run(loss, feed_dict=feed_test))
-        Xtest = np.reshape(sess.run(Xhat, feed_dict={Y: np.reshape(testY[99, :], [1, OUTPUT_SIZE])}), INPUT_SIZE)
+        Xtest = np.reshape(sess.run(Xhat, feed_dict={Y: np.reshape(testY[99, :], [1, OUTPUT_SIZE])}), newshape=(1,INPUT_SIZE))
         plt.figure(1)
-        plt.subplot(2, 1, 1)
-        plt.imshow(Xtest, cmap='gray')
+        plt.subplot(1, 2, 1)
+        plt.imshow(Xtest, cmap='gray', aspect='auto')
         plt.colorbar()
-        plt.subplot(2, 1, 2)
-        plt.imshow(np.reshape(testX[99, :], newshape=(N_pixel, int(N_pixel/2))), cmap='gray')
+        plt.subplot(1, 2, 2)
+        plt.imshow(np.reshape(testX[99, :], newshape=(1, INPUT_SIZE)), cmap='gray', aspect='auto')
         plt.colorbar()
         print(np.mean(test_loss))
         plt.show()

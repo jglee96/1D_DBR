@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import time
 import pandas as pd
 
-TRAIN_PATH = 'D:/1D_DBR/trainset/02'
+TRAIN_PATH = 'D:/1D_DBR/trainset/04'
 c = 299792458 * (10**(-6))
 N_pixel = 80
 dx = 5
@@ -15,7 +15,7 @@ minwave = 150
 maxwave = 3000
 wavestep = 5
 wavelength = np.array([np.arange(minwave, maxwave, wavestep)])
-Nsample = 1000
+Nsample = 100
 
 
 def calR(s, dx, N_pixel, wavelength, nh, nl):
@@ -87,6 +87,90 @@ def main():
 
     print('*****Train Set Prepared*****')
 
+
+def op_main():
+    start = time.time()
+
+    for i in range(50):
+        op_state = np.array([0, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+                             0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+                             1, 1, 1, 1, 1, 1, 1, 1, 0, 0,
+                             0, 0, 0, 0, 0, 0, 1, 1, 1, 1,
+                             1, 1, 1, 1, 1, 0, 0, 0, 0, 0,
+                             0, 0, 0, 1, 1, 1, 1, 1, 1, 1,
+                             1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+                             1, 1, 1, 1, 1, 1, 1, 1, 1, 0])
+        sname = TRAIN_PATH + '/state_' + str(i) + '.csv'
+        Rname = TRAIN_PATH + '/R_' + str(i) + '.csv'
+
+        for n in range(Nsample):
+            ch_idx = np.random.randint(N_pixel)
+            op_state = np.reshape(op_state, N_pixel)
+            op_state[ch_idx] = abs(op_state[ch_idx] - 1)
+
+            R = calR(op_state, dx, N_pixel, wavelength, nh, nl)
+            op_state = np.reshape(op_state, (1, N_pixel))
+            R = np.reshape(R, (1, wavelength.shape[1]))
+
+            with open(sname, "a") as sf:
+                np.savetxt(sf, op_state, fmt='%d', delimiter=',')
+            with open(Rname, "a") as Rf:
+                np.savetxt(Rf, R, fmt='%.5f', delimiter=',')
+
+            if (n) % 100 == 0:
+                print('{}th {}step {:.3f}s '.format(i, n, time.time() - start))
+
+
+def combine():
+    PATH1 = 'D:/1D_DBR/trainset/02'
+    Nfile1 = 20
+    PATH2 = 'D:/1D_DBR/trainset/03'
+    Nfile2 = 50
+
+    # Load Training Data 1
+    print("========      Load Data1     ========")
+    Xarray1 = []
+    Yarray1 = []
+    for nf in range(Nfile1):
+        sname = PATH1 + '/state_' + str(nf) + '.csv'
+        Xtemp = pd.read_csv(sname, header=None)
+        Xtemp = Xtemp.values
+        Xarray1.append(Xtemp)
+
+        Rname = PATH1 + '/R_' + str(nf) + '.csv'
+        Ytemp = pd.read_csv(Rname, header=None)
+        Ytemp = Ytemp.values
+        Yarray1.append(Ytemp)
+
+    print("========      Load Data2     ========")
+    Xarray2 = []
+    Yarray2 = []
+    for nf in range(Nfile2):
+        sname = PATH2 + '/state_' + str(nf) + '.csv'
+        Xtemp = pd.read_csv(sname, header=None)
+        Xtemp = Xtemp.values
+        Xarray2.append(Xtemp)
+
+        Rname = PATH2 + '/R_' + str(nf) + '.csv'
+        Ytemp = pd.read_csv(Rname, header=None)
+        Ytemp = Ytemp.values
+        Yarray2.append(Ytemp)
+
+    Xarray = Xarray1 + Xarray2
+    Yarray = Yarray1 + Yarray2
+    sX = np.concatenate(Xarray)
+    sY = np.concatenate(Yarray)
+
+    sname = TRAIN_PATH + '/state_' + str(0) + '.csv'
+    Rname = TRAIN_PATH + '/R_' + str(0) + '.csv'
+
+    with open(sname, "a") as sf:
+        np.savetxt(sf, sX, fmt='%d', delimiter=',')
+    with open(Rname, "a") as Rf:
+        np.savetxt(Rf, sY, fmt='%.5f', delimiter=',')
+
 if __name__ == "__main__":
     # Theory()
-    main()
+    # main()
+    # op_main()
+    combine()
