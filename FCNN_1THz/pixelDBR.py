@@ -1,6 +1,9 @@
 import numpy as np
 import tmm
 
+c = 299792458 * (10**6)
+
+
 def calR(s, dx, N_pixel, wavelength, nh, nl):
     # list of layer thickness in nm
     d_list = [np.inf] + [dx for i in range(N_pixel)] + [np.inf]
@@ -17,19 +20,21 @@ def calR(s, dx, N_pixel, wavelength, nh, nl):
     return Rnorm
 
 
-def calFWHM(R,wavelength,tarwave):
+def calBand(R, wavelength, tarwave, minwave, step, ratio):
     taridx = np.where(wavelength == tarwave)[1][0]
     tarint = R[0, taridx]
 
-    tarhi = list(i for i in range(taridx,wavelength.shape[1], 1) if R[0, i] < 0.5*tarint)[0]
-    tarlo = list(i for i in range(taridx,0,-1) if R[0, i] < 0.5*tarint)[0]
+    tarhi = minwave + step * list(i for i in range(taridx, wavelength.shape[1],1) if R[0, i] < ratio * tarint)[0]
+    tarlo = minwave + step * list(i for i in range(taridx, 0, -1) if R[0, i] < ratio * tarint)[0]
 
-    return tarhi - tarlo
+    length = tarhi - tarlo
+    frequency = (c * (1. / tarlo)) - (c * (1. / tarhi))
 
+    return length, frequency
 
 def reward(R, tarwave, wavelength, bandwidth):
     lband = tarwave - int(bandwidth / 2)
-    uband = tarwave + int(bandwidth / 2)
+    uband = tarwave - int(bandwidth / 2)
     lb_idx = np.where(wavelength == lband)[1][0]
     ub_idx = np.where(wavelength == uband)[1][0]
 
@@ -37,4 +42,3 @@ def reward(R, tarwave, wavelength, bandwidth):
     R_out = np.mean(np.hstack((R[:, 0:lb_idx+1], R[:, ub_idx:])), axis=1)
 
     return  R_in * (1 - R_out)
-    # return R_in / R_out

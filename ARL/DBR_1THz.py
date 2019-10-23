@@ -3,7 +3,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import pixelDBR
 
-N_pixel = 80
+N_pixel = 80 # trainset 02
+# N_pixel = 400
+# N_pixel = 200 # trsinset 05
 dx = 5
 nh = 2.092  # SiO2 at 1 THz
 nl = 1  # AIr
@@ -21,10 +23,11 @@ th = tarwave/(4*nh)
 tl = tarwave/(4*nl)
 print("======== Design Information ========")
 print('tarwave: {}, nh: {:.3f}, nl: {:.3f}'.format(tarwave, nh, nl))
-print('Th: {}, Tl: {}'.format(th, tl))
+print('Th: {:.2f}, Tl: {:.2f}'.format(th, tl))
 
-Nfile = 1
-TRAIN_PATH = 'D:/1D_DBR/trainset/04'
+Nfile = 20
+TRAIN_PATH = 'D:/1D_DBR/trainset/02'
+
 
 def getData():
     # Load Training Data
@@ -75,10 +78,12 @@ def main():
     result_R = pixelDBR.calR(result_state, dx, N_pixel, wavelength, nh, nl)
     result_R = np.reshape(result_R, newshape=(1, wavelength.shape[1]))
     result_reward = pixelDBR.reward(result_R, tarwave, wavelength, bandwidth)
-    result_fwhm = pixelDBR.calFWHM(result_R, wavelength, tarwave)
+    # result_fwhml, result_fwhmf = pixelDBR.calBand(result_R, wavelength, tarwave, minwave, wavestep, 0.5)
+    # result_99l, result_99f = pixelDBR.calBand(result_R, wavelength, tarwave, minwave, wavestep, 0.99)
     print("========        Result      ========")
     print('result reward: ', result_reward)
-    print('resulr fwhm: ', result_fwhm)
+    # print('resulr fwhm: {} um, {:.3f} THz'.format(result_fwhml, result_fwhmf*10**-12))
+    # print('resulr 99% width: {} um, {:.3f} THz'.format(result_99l, result_99f*10**-12))
     thickness = getThickness(result_state, dx, N_pixel)
     print(thickness)
 
@@ -93,15 +98,14 @@ def main():
     x = np.reshape(wavelength, wavelength.shape[1])
     result_R = np.reshape(result_R, wavelength.shape[1])
     plt.figure(1)
-    plt.subplot(2, 1, 1)
     plt.plot(x, result_R)
 
-    plt.subplot(2, 1, 2)
+    plt.figure(2)
     x = (c * (1. / wavelength))
     x = np.reshape(x*(10**-12), wavelength.shape[1])
     plt.plot(x, result_R)
 
-    plt.figure(2)
+    plt.figure(3)
     lx = np.arange(N_pixel)
     plt.bar(lx, result_state, width=1, color='blue')
     plt.show()

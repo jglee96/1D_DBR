@@ -3,10 +3,11 @@ import tmm
 import matplotlib.pyplot as plt
 import time
 import pandas as pd
+import pixelDBR
 
-TRAIN_PATH = 'D:/1D_DBR/trainset/04'
+TRAIN_PATH = 'D:/1D_DBR/trainset/05'
 c = 299792458 * (10**(-6))
-N_pixel = 80
+N_pixel = 200
 dx = 5
 nh = 2.092
 nl = 1
@@ -15,7 +16,7 @@ minwave = 150
 maxwave = 3000
 wavestep = 5
 wavelength = np.array([np.arange(minwave, maxwave, wavestep)])
-Nsample = 100
+Nsample = 1000
 
 
 def calR(s, dx, N_pixel, wavelength, nh, nl):
@@ -49,6 +50,13 @@ def Theory():
         Rnorm.append(tmm.coh_tmm('s', n_list, d_list, 0, w)['R'])
     print("time: ", time.time() - start)
 
+    Rnorm = np.reshape(Rnorm, newshape=(1, wavelength.shape[1]))
+    fwhml, fwhmf = pixelDBR.calBand(Rnorm, wavelength, tarwave, minwave, wavestep, 0.5)
+    b99l, b99f = pixelDBR.calBand(Rnorm, wavelength, tarwave, minwave, wavestep, 0.99)
+    print("========        Result      ========")
+    print('THeory fwhm: {} um, {:.3f} THz'.format(fwhml, fwhmf*10**-12))
+    print('THeory 99% width: {} um, {:.3f} THz'.format(b99l, b99f*10**-12))
+
     plt.figure(1)
     x = np.reshape(wavelength, wavelength.shape[1])
     Rnorm = np.reshape(Rnorm, wavelength.shape[1])
@@ -66,9 +74,9 @@ def main():
     print('N_pixel: {}, nh: {:.3f}, nl: {:.3f}'.format(N_pixel, nh, nl))
     start = time.time()
 
-    for i in range(10):
-        sname = TRAIN_PATH + '/state_' + str(i+10) + '.csv'
-        Rname = TRAIN_PATH + '/R_' + str(i+10) + '.csv'
+    for i in range(3):
+        sname = TRAIN_PATH + '/state_' + str(i+77) + '.csv'
+        Rname = TRAIN_PATH + '/R_' + str(i+77) + '.csv'
 
         for n in range(Nsample):
             state = np.random.randint(2, size=N_pixel)
@@ -83,7 +91,7 @@ def main():
                 np.savetxt(Rf, R, fmt='%.5f', delimiter=',')
 
             if (n) % 100 == 0:
-                print('{}th {}step {:.3f}s '.format(i+10, n, time.time() - start))
+                print('{}th {}step {:.3f}s '.format(i+77, n, time.time() - start))
 
     print('*****Train Set Prepared*****')
 
@@ -171,6 +179,6 @@ def combine():
 
 if __name__ == "__main__":
     # Theory()
-    # main()
+    main()
     # op_main()
-    combine()
+    # combine()

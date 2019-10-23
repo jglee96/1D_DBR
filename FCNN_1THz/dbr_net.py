@@ -56,46 +56,59 @@ def Ratio_Optimization(output_folder, weight_name_save, n_batch, lr_rate, num_la
     weights, biases = load_weights(output_folder, weight_name_save, num_layers)
     Yhat = forwardprop(Xint, weights, biases, num_layers)
 
-    Inval = tf.matmul(Y, tf.transpose(Yhat))
-    Outval = tf.matmul((1-Y), tf.transpose(Yhat))
-    cost = Outval / Inval
+    Inval = tf.reduce_mean(tf.matmul(Y, tf.transpose(Yhat)))
+    Outval = tf.reduce_mean(tf.matmul((1-Y), tf.transpose(Yhat)))
+    # cost = Outval / Inval
+    cost = Outval * (10 - Inval)
     optimizer = tf.train.AdamOptimizer(learning_rate=1E-4).minimize(cost, var_list=[X])
 
-    idx_1 = np.where(wavelength == 275)[1][0]
-    idx_2 = np.where(wavelength == 325)[1][0]
+    idx_1 = np.where(wavelength == int(tarwave - bandwidth/2))[1][0]
+    idx_2 = np.where(wavelength == int(tarwave + bandwidth/2))[1][0]
     design_y = np.zeros((1, OUTPUT_SIZE))
     design_y[0, idx_1:idx_2+1] = 1
     design_y.tolist()
 
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
-        for n in range(10000):
+        for n in range(20000):
             sess.run(optimizer, feed_dict={Y: design_y})
             if (n % 100) == 0:
                 temp_R = np.reshape(sess.run(Yhat), newshape=(1, wavelength.shape[1]))
-                temp_cost = sess.run(cost, feed_dict={Y: design_y})[0][0]
+                temp_cost = sess.run(cost, feed_dict={Y: design_y})
+                temp_Inval = sess.run(Inval, feed_dict={Y: design_y})
                 temp_reward = pixelDBR.reward(temp_R, tarwave, wavelength, bandwidth)
-                print("{}th epoch, reward: {:.4f}, cost: {:.4f}".format(n, temp_reward[0], temp_cost))
-        optimized_x = np.reshape(Xint.eval().astype(int), newshape=N_pixel)
-        # optimized_R = np.reshape(sess.run(Yhat), newshape=(1, wavelength.shape[1]))
-        optimized_R = np.reshape(pixelDBR.calR(optimized_x, dx, N_pixel, wavelength, nh, nl), newshape=(1, wavelength.shape[1]))
-        optimized_reward = pixelDBR.reward(optimized_R, tarwave, wavelength, bandwidth)
-    print("Optimized result: {:.4f}".format(optimized_reward[0]))
-    print(optimized_x)
+                print("{}th epoch, reward: {:.4f}, cost: {:.4f}, Inval: {:.4f}".format(n, temp_reward[0], temp_cost, temp_Inval))
+        op_x = np.reshape(Xint.eval().astype(int), newshape=N_pixel)
+        # op_R = np.reshape(sess.run(Yhat), newshape=(1, wavelength.shape[1]))
+        op_R = np.reshape(pixelDBR.calR(op_x, dx, N_pixel, wavelength, nh, nl), newshape=(1, wavelength.shape[1]))
+        op_reward = pixelDBR.reward(op_R, tarwave, wavelength, bandwidth)
+        op_fwhml, op_fwhmf = pixelDBR.calBand(op_R, wavelength, tarwave, minwave, wavestep, 0.5)
+        op_99l, op_99f = pixelDBR.calBand(op_R, wavelength, tarwave, minwave, wavestep, 0.99)
+    print("========        Result      ========")
+    print('result fwhm: {} um, {:.3f} THz'.format(op_fwhml, op_fwhmf*10**-12))
+    print('result 99% width: {} um, {:.3f} THz'.format(op_99l, op_99f*10**-12))
+    print("Optimized result: {:.4f}".format(op_reward[0]))
+    for idx, x in enumerate(op_x):
+        if idx == 0:
+            print("[{}, ".format(x), end='')
+        elif idx == N_pixel-1:
+            print("{}]".format(x), end='')
+        else:
+            print("{}, ".format(x), end='')
 
     wavelength_x = np.reshape(wavelength, wavelength.shape[1])
-    optimized_R = np.reshape(optimized_R, wavelength.shape[1])
+    op_R = np.reshape(op_R, wavelength.shape[1])
     plt.figure(1)
-    plt.subplot(2, 1, 1)
-    plt.plot(wavelength_x, optimized_R)
-    plt.subplot(2, 1, 2)
-    wavelength_x = (c * (1. / wavelength)) * 10**(-12)
-    wavelength_x = np.reshape(wavelength_x, wavelength.shape[1])
-    plt.plot(wavelength_x, optimized_R)
+    plt.plot(wavelength_x, op_R)
 
     plt.figure(2)
+    wavelength_x = (c * (1. / wavelength)) * 10**(-12)
+    wavelength_x = np.reshape(wavelength_x, wavelength.shape[1])
+    plt.plot(wavelength_x, op_R)
+
+    plt.figure(3)
     pixel_x = np.arange(N_pixel)
-    plt.bar(pixel_x, optimized_x, width=1, color="black")
+    plt.bar(pixel_x, op_x, width=1, color="black")
     plt.show()
 
 
