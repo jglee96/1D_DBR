@@ -1,4 +1,5 @@
 Design 1D DBR by using machine learning
+
 Using Algorithm:
 - Additive Reinforce Learning (ARL)
 
