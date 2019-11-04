@@ -1,0 +1,10 @@
+1 THz
+N_pixel = 400
+dx = 5
+nh = 2.092
+nl = 1
+tarwave = 300
+minwave = 150
+maxwave = 3000
+wavestep = 5
+Nsample = 1000
