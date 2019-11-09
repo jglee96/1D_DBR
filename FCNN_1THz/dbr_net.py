@@ -48,6 +48,13 @@ def getData():
 
 def Ratio_Optimization(output_folder, weight_name_save, n_batch, lr_rate, num_layers, n_hidden):
     OUTPUT_SIZE = wavelength.shape[1]
+
+    idx_1 = np.where(wavelength == int(tarwave - bandwidth/2))[1][0]
+    idx_2 = np.where(wavelength == int(tarwave + bandwidth/2))[1][0]
+    design_y = np.zeros((1, OUTPUT_SIZE))
+    design_y[0, idx_1:idx_2+1] = 1
+    design_y.tolist()
+
     init_list_rand = tf.constant(np.random.randint(2, size=(1, N_pixel)), dtype=tf.float32)
     X = tf.get_variable(name='b', initializer=init_list_rand)
     Xint = binaryRound(X)
@@ -56,17 +63,13 @@ def Ratio_Optimization(output_folder, weight_name_save, n_batch, lr_rate, num_la
     weights, biases = load_weights(output_folder, weight_name_save, num_layers)
     Yhat = forwardprop(Xint, weights, biases, num_layers)
 
-    Inval = tf.reduce_mean(tf.matmul(Y, tf.transpose(Yhat)))
-    Outval = tf.reduce_mean(tf.matmul((1-Y), tf.transpose(Yhat)))
+    idxwidth = idx_2 - idx_1
+    Inval = tf.reduce_mean(tf.matmul(Y, tf.transpose(Yhat))) / idxwidth
+    Outval = tf.reduce_mean(tf.matmul((1-Y), tf.transpose(Yhat))) / (OUTPUT_SIZE - idxwidth)
     # cost = Outval / Inval
-    cost = Outval * (10 - Inval)
+    # cost = Outval * (10 - Inval)
+    cost = Outval * (1-Inval)
     optimizer = tf.train.AdamOptimizer(learning_rate=1E-4).minimize(cost, var_list=[X])
-
-    idx_1 = np.where(wavelength == int(tarwave - bandwidth/2))[1][0]
-    idx_2 = np.where(wavelength == int(tarwave + bandwidth/2))[1][0]
-    design_y = np.zeros((1, OUTPUT_SIZE))
-    design_y[0, idx_1:idx_2+1] = 1
-    design_y.tolist()
 
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())

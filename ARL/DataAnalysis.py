@@ -72,10 +72,16 @@ def main():
     Pt = Tstatic(reward, Nsample)
 
     x = np.arange(10)
+    xs = np.arange(0.1, 1.1, 0.1)
     Tvalues = ['0,1', '0.2', '0.3', '0.4', '0.5', '0.6', '0.7', '0.8', '0.9', '1.0']
     plt.bar(x, Pt)
     plt.xticks(x, Tvalues)
     plt.show()
+
+    with open('D:/1D_DBR/Figure_plot/Data_distribution(04).csv', "a") as sf:
+        np.savetxt(sf, np.reshape(xs, (1, xs.shape[0])), fmt='%.1f', delimiter=',')
+    with open('D:/1D_DBR/Figure_plot/Data_distribution(04).csv', "a") as sf:
+        np.savetxt(sf, np.reshape(Pt, (1, len(Pt))), fmt='%d', delimiter=',')
 
 
 if __name__=="__main__":
