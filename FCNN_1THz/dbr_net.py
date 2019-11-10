@@ -20,7 +20,6 @@ wavelength = np.array([np.arange(minwave, maxwave, wavestep)])
 bandwidth = 50
 
 Nfile = 20
-PATH = 'D:/1D_DBR/FCNN'
 TRAIN_PATH = 'D:/1D_DBR/trainset/02'
 
 
@@ -174,16 +173,28 @@ def main(output_folder, weight_name_save, n_batch, lr_rate, num_layers, n_hidden
         sess.run(tf.global_variables_initializer())
 
         # Training
+        Training_loss = []
         for n in range(int(Nlearning*n_copy/n_batch)):
             input_X = np.reshape(trainX_total[n*n_batch:(n+1)*n_batch], [n_batch, INPUT_SIZE])
             output_Y = np.reshape(trainY_total[n*n_batch:(n+1)*n_batch], [n_batch, OUTPUT_SIZE])
             feed = {X: input_X, Y: output_Y}
-            sess.run(train, feed_dict=feed)
+            _, temp = sess.run([train, loss], feed_dict=feed)
+            Training_loss.append(temp)
 
         # Save
         save_weights(weights, biases, output_folder, weight_name_save, num_layers)
 
         # Test
+        Test_loss = []
+        test_batch = int(n_batch/20)
+        for n in range(int(Ntest/test_batch)):
+            input_X = np.reshape(testX[n*test_batch:(n+1)*test_batch], [test_batch, INPUT_SIZE])
+            output_Y = np.reshape(testY[n*test_batch:(n+1)*test_batch], [test_batch, OUTPUT_SIZE])
+            feed = {X: input_X, Y: output_Y}
+            _, temp = sess.run([train, loss], feed_dict=feed)
+            Test_loss.append(temp)
+
+        # Example test
         Tstate = np.random.randint(2, size=N_pixel)
         TR = pixelDBR.calR(Tstate, dx, N_pixel, wavelength, nh, nl)
         tX = np.reshape(Tstate, [-1, INPUT_SIZE])
@@ -202,6 +213,16 @@ def main(output_folder, weight_name_save, n_batch, lr_rate, num_layers, n_hidden
 
     plt.subplot(2, 1, 2)
     plt.plot(x, NR)
+
+    plt.figure(3)
+    plt.plot(Training_loss)
+    with open('D:/1D_DBR/FCNN_1THz/Training_loss.csv', 'w') as lossfile:
+        np.savetxt(lossfile, Training_loss, delimiter=',', fmt='%.5f')
+
+    plt.figure(4)
+    plt.plot(Test_loss)
+    with open('D:/1D_DBR/FCNN_1THz/Test_loss.csv', 'w') as lossfile:
+        np.savetxt(lossfile, Test_loss, delimiter=',', fmt='%.5f')
     plt.show()
 
 
@@ -242,5 +263,5 @@ if __name__=="__main__":
             'n_hidden':int(dict['n_hidden'])
             }
 
-    # main(**kwargs)
-    Ratio_Optimization(**kwargs)
+    main(**kwargs)
+    # Ratio_Optimization(**kwargs)

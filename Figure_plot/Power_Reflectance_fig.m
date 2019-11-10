@@ -47,7 +47,7 @@ Theory_Rmax_freq = Theory_freq(1, Theory_Rmax_freqindex);
 Theory_Linewidth = 2;
 Theory_color = 'k';
 
-%% Plot %%
+%% ARL Plot %%
 % plot properties
 label_Fontsize = 20;
 tick_Fontsize = 15;
@@ -56,26 +56,53 @@ tick_Fontsize = 15;
 figure(1);
 plot(ARL_wave(1,:), ARL_wave(2,:), ARL_color, 'Linewidth', ARL_Linewidth);
 hold on;
-plot(ANN_wave(1,:), ANN_wave(2,:), ANN_color, 'Linewidth', ANN_Linewidth);
-hold on;
 plot(Theory_wave(1,:), Theory_wave(2,:), Theory_color, 'Linewidth', Theory_Linewidth);
 xlabel('Wavelength [um]', 'Fontsize', label_Fontsize);
 ylabel('Reflectance', 'Fontsize', label_Fontsize);
+title('ARL');
+xlim([150 3000]);
 ax = gca;
 ax.FontSize = tick_Fontsize;
 
 % frequency
 figure(2);
-%plot(ARL_freq(1,:), ARL_freq(2,:), ARL_color, 'Linewidth', ARL_Linewidth);
-%hold on;
-%plot(ANN_freq(1,:), ANN_freq(2,:), ANN_color, 'Linewidth', ANN_Linewidth);
-%hold on;
+plot(ARL_freq(1,:), ARL_freq(2,:), ARL_color, 'Linewidth', ARL_Linewidth);
+hold on;
 plot(Theory_freq(1,:), Theory_freq(2,:), Theory_color, 'Linewidth', Theory_Linewidth);
 xlabel('Frequency [THz]', 'Fontsize', label_Fontsize);
 ylabel('Reflectance', 'Fontsize', label_Fontsize);
+title('ARL');
+xlim([0.1 2]);
+ax = gca;
+ax.FontSize = tick_Fontsize;
+%% ANN Plot %%
+% plot properties
+label_Fontsize = 20;
+tick_Fontsize = 15;
+
+% wavelength
+figure(3);
+plot(ANN_wave(1,:), ANN_wave(2,:), ANN_color, 'Linewidth', ANN_Linewidth);
+hold on;
+plot(Theory_wave(1,:), Theory_wave(2,:), Theory_color, 'Linewidth', Theory_Linewidth);
+xlabel('Wavelength [um]', 'Fontsize', label_Fontsize);
+ylabel('Reflectance', 'Fontsize', label_Fontsize);
+title('ANN');
+xlim([150 3000]);
 ax = gca;
 ax.FontSize = tick_Fontsize;
 
+% frequency
+figure(4);
+plot(ANN_freq(1,:), ANN_freq(2,:), ANN_color, 'Linewidth', ANN_Linewidth);
+hold on;
+plot(Theory_freq(1,:), Theory_freq(2,:), Theory_color, 'Linewidth', Theory_Linewidth);
+xlabel('Frequency [THz]', 'Fontsize', label_Fontsize);
+ylabel('Reflectance', 'Fontsize', label_Fontsize);
+title('ANN');
+xlim([0.1 2]);
+ax = gca;
+ax.FontSize = tick_Fontsize;
 %% Plot E-field %%
 design_wave = 300;
 dx = 5;
@@ -99,7 +126,7 @@ ANN_list = [1, 1, 1, 1, 1, 1, 1, 0, 0, 0, ...
             1, 1, 1, 0, 0, 0, 0, 0, 0, 0, ...
             0, 0, 0, 1, 1, 1, 1, 1, 1, 1];
 % ARL Efield
-figure(3);
+figure(5);
 plot(ARL_E_low(1,:), ARL_E_low(2,:), 'r', 'Linewidth', ARL_Linewidth);
 hold on;
 plot(ARL_E_high(1,:), ARL_E_high(2,:), 'b', 'Linewidth', ARL_Linewidth);
@@ -111,11 +138,12 @@ for i=2:80
 end
 xlabel('x [um]', 'Fontsize', label_Fontsize);
 ylabel('E-field', 'Fontsize', label_Fontsize);
+title('ARL E-field');
 ax = gca;
 ax.FontSize = tick_Fontsize;
 
 % ANN Efield
-figure(4);
+figure(6);
 plot(ANN_E_low(1,:), ANN_E_low(2,:), 'r', 'Linewidth', ANN_Linewidth);
 hold on;
 plot(ANN_E_high(1,:), ANN_E_high(2,:), 'b', 'Linewidth', ANN_Linewidth);
@@ -127,11 +155,12 @@ for i=2:80
 end
 xlabel('x [um]', 'Fontsize', label_Fontsize);
 ylabel('E-field', 'Fontsize', label_Fontsize);
+title('ANN E-field');
 ax = gca;
 ax.FontSize = tick_Fontsize;
 
 %Theory Efield
-figure(5);
+figure(7);
 plot(Theory_E_low(1,:), Theory_E_low(2,:), 'r', 'Linewidth', Theory_Linewidth);
 hold on;
 plot(Theory_E_high(1,:), Theory_E_high(2,:), 'b', 'Linewidth', Theory_Linewidth);
@@ -148,5 +177,6 @@ end
             
 xlabel('x [um]', 'Fontsize', label_Fontsize);
 ylabel('E-field', 'Fontsize', label_Fontsize);
+title('Theory E-field');
 ax = gca;
 ax.FontSize = tick_Fontsize;
