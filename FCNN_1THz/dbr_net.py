@@ -191,7 +191,7 @@ def main(output_folder, weight_name_save, n_batch, lr_rate, num_layers, n_hidden
             input_X = np.reshape(testX[n*test_batch:(n+1)*test_batch], [test_batch, INPUT_SIZE])
             output_Y = np.reshape(testY[n*test_batch:(n+1)*test_batch], [test_batch, OUTPUT_SIZE])
             feed = {X: input_X, Y: output_Y}
-            _, temp = sess.run([train, loss], feed_dict=feed)
+            temp = sess.run(loss, feed_dict=feed)
             Test_loss.append(temp)
 
         # Example test

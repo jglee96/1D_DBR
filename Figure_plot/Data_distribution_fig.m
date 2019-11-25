@@ -23,6 +23,7 @@ xlabel('Reward', 'Fontsize', label_Fontsize);
 ylabel('# of data (x1000)', 'Fontsize', label_Fontsize);
 ax = gca;
 ax.FontSize = tick_Fontsize;
+ax.FontWeight = 'bold';
 
 % cost
 figure(2);
@@ -31,3 +32,4 @@ xlabel('Cost', 'Fontsize', label_Fontsize);
 ylabel('# of data (x1000)', 'Fontsize', label_Fontsize);
 ax = gca;
 ax.FontSize = tick_Fontsize;
+ax.FontWeight = 'bold';
