@@ -21,7 +21,7 @@ def calR(s, dx, N_pixel, wavelength, nh, nl):
 
 
 def calBand(R, wavelength, tarwave, minwave, step, ratio):
-    taridx = np.where(wavelength == tarwave)[1][0]
+    taridx = np.where(abs(wavelength - tarwave) < 1e-3)[1][0]
     tarint = R[0, taridx]
 
     tarhi = minwave + step * list(i for i in range(taridx, wavelength.shape[1], 1) if R[0, i] < ratio * tarint)[0]
@@ -34,12 +34,15 @@ def calBand(R, wavelength, tarwave, minwave, step, ratio):
 
 
 def reward(R, tarwave, wavelength, bandwidth):
+    # taridx = np.where(wavelength == tarwave)[1][0]
+    # tar_reward = R[0, taridx] * 1e2 - int(R[0, taridx] * 1e2)
+
     lband = tarwave - int(bandwidth / 2)
-    uband = tarwave - int(bandwidth / 2)
+    uband = tarwave + int(bandwidth / 2)
     lb_idx = np.where(wavelength == lband)[1][0]
     ub_idx = np.where(wavelength == uband)[1][0]
 
     R_in = np.mean(R[:, lb_idx:ub_idx+1], axis=1)
     R_out = np.mean(np.hstack((R[:, 0:lb_idx+1], R[:, ub_idx:])), axis=1)
 
-    return  R_in * (1 - R_out)
+    return R_in * (1 - R_out)

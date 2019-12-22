@@ -16,7 +16,7 @@ minwave = 150
 maxwave = 3000
 wavestep = 5
 wavelength = np.array([np.arange(minwave, maxwave, wavestep)])
-bandwidth = 50
+bandwidth = 100
 
 # Base data
 th = tarwave/(4*nh)

@@ -6,8 +6,8 @@ c = 299792458;
 %% ARL %%
 ARL_wave = csvread('ARL_wave.csv');
 ARL_freq = csvread('ARL_freq.csv');
-ARL_E_low = csvread('ARL_E_low.csv');
-ARL_E_high = csvread('ARL_E_high.csv');
+% ARL_E_low = csvread('ARL_E_low.csv');
+% ARL_E_high = csvread('ARL_E_high.csv');
 ARL_Rmax = max(ARL_freq(2,:));
 % ARL find max reflectance information
 ARL_Rmax_waveindex = find(ARL_wave(2,:) == ARL_Rmax);
@@ -26,8 +26,8 @@ ARL_color = 'b';
 %% ANN %%
 ANN_wave = csvread('ANN_wave.csv');
 ANN_freq = csvread('ANN_freq.csv');
-ANN_E_low = csvread('ANN_E_low.csv');
-ANN_E_high = csvread('ANN_E_high.csv');
+% ANN_E_low = csvread('ANN_E_low.csv');
+% ANN_E_high = csvread('ANN_E_high.csv');
 ANN_Rmax = max(ANN_freq(2,:));
 % ARL find max reflectance information
 ANN_Rmax_waveindex = find(ANN_wave(2,:) == ANN_Rmax);
@@ -46,8 +46,8 @@ ANN_color = 'r.-';
 %% Theory %%
 Theory_wave = csvread('Theory_wave.csv');
 Theory_freq = csvread('Theory_freq.csv');
-Theory_E_low = csvread('Theory_E_low.csv');
-Theory_E_high = csvread('Theory_E_high.csv');
+% Theory_E_low = csvread('Theory_E_low.csv');
+% Theory_E_high = csvread('Theory_E_high.csv');
 Theory_Rmax = max(Theory_freq(2,:));
 % Theory find max reflectance information
 Theory_Rmax_waveindex = find(Theory_wave(2,:) == Theory_Rmax);
@@ -74,7 +74,7 @@ plot(ARL_wave(1,:), ARL_wave(2,:), ARL_color, 'Linewidth', ARL_Linewidth);
 hold on;
 plot(Theory_wave(1,:), Theory_wave(2,:), Theory_color, 'Linewidth', Theory_Linewidth);
 xlabel('Wavelength [um]', 'Fontsize', label_Fontsize);
-ylabel('Reflectance', 'Fontsize', label_Fontsize);
+ylabel('Reflection', 'Fontsize', label_Fontsize);
 title('ARL');
 xlim([150 3000]);
 ax = gca;
@@ -83,26 +83,28 @@ ax.FontWeight = 'bold';
 
 % frequency
 figure;
-plot(ARL_freq(1,:), ARL_freq(2,:), ARL_color, 'Linewidth', ARL_Linewidth);
-hold on;
+% plot(ARL_freq(1,:), ARL_freq(2,:), ARL_color, 'Linewidth', ARL_Linewidth);
+% hold on;
 plot(Theory_freq(1,:), Theory_freq(2,:), Theory_color, 'Linewidth', Theory_Linewidth);
 xlabel('Frequency [THz]', 'Fontsize', label_Fontsize);
-ylabel('Reflectance', 'Fontsize', label_Fontsize);
+ylabel('Reflection', 'Fontsize', label_Fontsize);
 % title('ARL');
 xlim([0.1 2]);
+% xlim([0.25 1.75]);
 ax = gca;
 ax.FontSize = tick_Fontsize;
 ax.FontWeight = 'bold';
 
 figure;
-plot(ARL_freq(1,:), ARL_freq(2,:), ARL_color, 'Linewidth', ARL_Linewidth);
+plot(ARL_freq(1,:), 10.*log10(1 - ARL_freq(2,:)), ARL_color, 'Linewidth', ARL_Linewidth);
 hold on;
-plot(Theory_freq(1,:), Theory_freq(2,:), Theory_color, 'Linewidth', Theory_Linewidth);
+plot(Theory_freq(1,:), 10.*log10(1 - Theory_freq(2,:)), Theory_color, 'Linewidth', Theory_Linewidth);
+hold on;
+yline(10*log10(1-0.99), '--m', 'Linewidth', 3);
 xlabel('Frequency [THz]', 'Fontsize', label_Fontsize);
-ylabel('Reflectance', 'Fontsize', label_Fontsize);
+ylabel('Transmission', 'Fontsize', label_Fontsize);
 % title('ARL');
-xlim([0.8 1.2]);
-ylim([0.99 1]);
+xlim([0.25 1.75]);
 ax = gca;
 ax.FontSize = tick_Fontsize;
 ax.FontWeight = 'bold';
@@ -117,7 +119,7 @@ plot(ANN_wave(1,:), ANN_wave(2,:), ANN_color, 'Linewidth', ANN_Linewidth);
 hold on;
 plot(Theory_wave(1,:), Theory_wave(2,:), Theory_color, 'Linewidth', Theory_Linewidth);
 xlabel('Wavelength [um]', 'Fontsize', label_Fontsize);
-ylabel('Reflectance', 'Fontsize', label_Fontsize);
+ylabel('Reflection', 'Fontsize', label_Fontsize);
 title('ANN');
 xlim([150 3000]);
 ax = gca;
@@ -130,26 +132,29 @@ plot(ANN_freq(1,:), ANN_freq(2,:), ANN_color, 'Linewidth', ANN_Linewidth);
 hold on;
 plot(Theory_freq(1,:), Theory_freq(2,:), Theory_color, 'Linewidth', Theory_Linewidth);
 xlabel('Frequency [THz]', 'Fontsize', label_Fontsize);
-ylabel('Reflectance', 'Fontsize', label_Fontsize);
+ylabel('Reflection', 'Fontsize', label_Fontsize);
 % title('ANN');
-xlim([0.1 2]);
+% xlim([0.1 2]);
+xlim([0.25 1.75]);
 ax = gca;
 ax.FontSize = tick_Fontsize;
 ax.FontWeight = 'bold';
 
 figure;
-plot(ANN_freq(1,:), ANN_freq(2,:), ANN_color, 'Linewidth', ANN_Linewidth);
+plot(ANN_freq(1,:), 10.*log10(1 - ANN_freq(2,:)), ANN_color, 'Linewidth', ANN_Linewidth);
 hold on;
-plot(Theory_freq(1,:), Theory_freq(2,:), Theory_color, 'Linewidth', Theory_Linewidth);
+plot(Theory_freq(1,:), 10.*log10(1 - Theory_freq(2,:)), Theory_color, 'Linewidth', Theory_Linewidth);
+hold on;
+yline(10*log10(1-0.99), '--m', 'Linewidth', 3);
 xlabel('Frequency [THz]', 'Fontsize', label_Fontsize);
-ylabel('Reflectance', 'Fontsize', label_Fontsize);
+ylabel('Transmission', 'Fontsize', label_Fontsize);
 % title('ANN');
-xlim([0.8 1.3]);
-ylim([0.99 1]);
+xlim([0.25 1.75]);
 ax = gca;
 ax.FontSize = tick_Fontsize;
 ax.FontWeight = 'bold';
 %% Plot E-field %%
+%{
 design_wave = 300;
 dx = 5;
 nh = 2.092;
@@ -226,6 +231,7 @@ ylabel('E-field', 'Fontsize', label_Fontsize);
 title('Theory E-field');
 ax = gca;
 ax.FontSize = tick_Fontsize;
+%}
 
 function y=find_bandwidth(R, max_idx, r)
 for i=1:1:length(R)
