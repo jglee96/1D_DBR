@@ -102,7 +102,7 @@ plot(Theory_freq(1,:), 10.*log10(1 - Theory_freq(2,:)), Theory_color, 'Linewidth
 hold on;
 yline(10*log10(1-0.99), '--m', 'Linewidth', 3);
 xlabel('Frequency [THz]', 'Fontsize', label_Fontsize);
-ylabel('Transmission', 'Fontsize', label_Fontsize);
+ylabel('Transmission [dB]', 'Fontsize', label_Fontsize);
 % title('ARL');
 xlim([0.25 1.75]);
 ax = gca;
@@ -147,7 +147,7 @@ plot(Theory_freq(1,:), 10.*log10(1 - Theory_freq(2,:)), Theory_color, 'Linewidth
 hold on;
 yline(10*log10(1-0.99), '--m', 'Linewidth', 3);
 xlabel('Frequency [THz]', 'Fontsize', label_Fontsize);
-ylabel('Transmission', 'Fontsize', label_Fontsize);
+ylabel('Transmission [dB]', 'Fontsize', label_Fontsize);
 % title('ANN');
 xlim([0.25 1.75]);
 ax = gca;
